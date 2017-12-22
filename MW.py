@@ -15,23 +15,28 @@ class ProcessHooker:
         """
             Frida COMMS
         """
-        if message['type'] == 'send':
-            stanza = message['payload']
-            if stanza['name'] == '+log':
-                msg=str(stanza["payload"])
-                logl("["+str(self.pid)+"]\t"+msg)
-                try:
-                    self.extract.post({ 'type': '+log-ack' })
-                except Exception as e:
-                    pass
+        try:
+            if message['type'] == 'send':
+                stanza = message['payload']
+                if stanza['name'] == '+log':
+                    msg = str(stanza["payload"])
+                    logl("[" + str(self.pid) + "]\t" + msg)
+                    try:
+                        self.extract.post({'type': '+log-ack'})
+                    except Exception as e:
+                        pass
 
-            elif stanza['name'] == '+pkill':
-                logl( "Kill Sub-Process: " + str(stanza['payload']))
+                elif stanza['name'] == '+pkill':
+                    logl("Kill Sub-Process: " + str(stanza['payload']))
 
-        else:
-            logl( "==========ERROR==========")
-            logl(message)
-            logl("=========================")
+            else:
+                logl("==========ERROR==========")
+                logl(message)
+                logl("=========================")
+        except Exception as ae:
+            logl("exception on _process_message")
+            pass
+
 
     def inject_script(self,jsfile):
         # TODO: upgade to use frida-compile

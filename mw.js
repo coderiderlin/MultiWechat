@@ -15,7 +15,7 @@ var ptrMessageBoxA = Module.findExportByName("user32.dll","MessageBoxA");
 var MessageBoxA=new NativeFunction(ptrMessageBoxA,'int',['int','pointer','pointer','int'],'stdcall');
 log("ptrMessageBoxA :"+ptrMessageBoxA);
 Interceptor.replace(ptrMessageBoxA,new NativeCallback(function (hwnd,pText,pTitle,type) {
-    strText=Memory.readnsiString(pText);
+    strText=Memory.readAnsiString(pText);
     strTitle=Memory.readAnsiString(pTitle);
     log("MessageBoxA "+strText+" with title "+strTitle);
     strHook=Memory.allocAnsiString("hooked!");
