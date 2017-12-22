@@ -1,6 +1,10 @@
 import frida
 import sys
 from utils.utils import *
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 class ProcessHooker:
     def __init__(self,cmd):
         self.pid=frida.spawn(cmd)
