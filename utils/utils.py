@@ -8,6 +8,8 @@ import urllib2
 
 import chardet
 import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 import requests
 from requests import ConnectionError
@@ -49,6 +51,7 @@ USER_AGENTS = [
     "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
 ]
 
+
 def appendStrToFile(sstr, filepath):
     f = open(filepath, "a+")
     try:
@@ -62,7 +65,7 @@ def appendStrToFile(sstr, filepath):
 def logToFile(msg, filepath):
     prefix = "[" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "]"
     logtext = prefix + "\t" + msg
-    appendStrToFile(msg, filepath)
+    appendStrToFile(logtext, filepath)
 
 
 def loglToFile(msg, filepath):
@@ -97,11 +100,8 @@ def logldebug(msg):
 
 
 def logl(msg):
-    msg=str(msg)
+    msg = str(msg)
     log("[.] " + msg + "\n")
-
-
-
 
 
 def GetEncoding(data):
@@ -201,26 +201,30 @@ def writeFile(filename, data):
     f.write(data)
     f.close()
 
+
 def getFileMd5(filepath):
     return DoCmd("md5sum " + filepath + "|grep -oE '[a-zA-Z0-9]{32}'").strip()
     pass
 
+
 def reprint(msg):
-    sys.stdout.write("\r" + msg )
+    sys.stdout.write("\r" + msg)
 
 
-def urlencode( val):
+def urlencode(val):
     if isinstance(val, unicode):
         return urllib.quote(str(val), safe='/:?=')
     return urllib.quote(val, safe='/:?=')
 
-def GetUrlContent( url):
+
+def GetUrlContent(url):
     request = urllib2.Request(urlencode(url))
     response = urllib2.urlopen(request)
     page = response.read()
     logl(page)
     encoding = GetEncoding(page)
     return page.decode(encoding)
+
 
 def get_header():
     return {
@@ -231,12 +235,37 @@ def get_header():
         'Accept-Encoding': 'gzip, deflate',
     }
 
+
 TIMEOUT = 5
-def GetUrlContent2(url):
-    r = requests.get(url=url, headers=get_header(), timeout=TIMEOUT)
-    r.encoding = chardet.detect(r.content)['encoding']
+
+
+def GetUrlContent2(url,proxies=None):
+    try:
+        if proxies is None:
+            r = requests.get(url=url, headers=get_header(), timeout=TIMEOUT)
+        else:
+            r = requests.get(url=url, headers=get_header(), timeout=TIMEOUT,proxies=proxies)
+        r.encoding = chardet.detect(r.content)['encoding']
+    except Exception as e:
+        raise BaseException("#ConnectionException:"+str(e.message))
     if not r.ok:
-        #raise ConnectionError
-        return "#ConnectionError"
+        # raise ConnectionError
+        raise BaseException("#ConnectionError:"+str(r.reason))
+    else:
+        return r.text
+
+
+def PostUrlWithDataAndHeader(url, data, header,proxies=None):
+    try:
+        if proxies is None:
+            r = requests.post(url=url, data=data, headers=header, timeout=TIMEOUT)
+        else:
+            r = requests.post(url=url, data=data, headers=header, timeout=TIMEOUT,proxies=proxies)
+        r.encoding = chardet.detect(r.content)['encoding']
+    except Exception as e:
+        raise BaseException("#ConnectionException:"+e.message)
+    if not r.ok:
+        # raise ConnectionError
+        raise BaseException("#ConnectionError"+str(r.reason))
     else:
         return r.text
