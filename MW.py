@@ -1,5 +1,6 @@
 import frida
 import sys
+import time
 from utils.utils import *
 
 reload(sys)
@@ -21,10 +22,10 @@ class ProcessHooker:
                 if stanza['name'] == '+log':
                     msg = str(stanza["payload"])
                     logl("[" + str(self.pid) + "]\t" + msg)
-                    try:
-                        self.extract.post({'type': '+log-ack'})
-                    except Exception as e:
-                        pass
+                    # try:
+                    #     self.extract.post({'type': '+log-ack'})
+                    # except Exception as e:
+                    #     pass
 
                 elif stanza['name'] == '+pkill':
                     logl("Kill Sub-Process: " + str(stanza['payload']))
@@ -34,7 +35,7 @@ class ProcessHooker:
                 logl(message)
                 logl("=========================")
         except Exception as ae:
-            logl("exception on _process_message")
+            #logl("exception on _process_message")
             pass
 
 
@@ -59,6 +60,7 @@ def main():
     logl("process spwnded.");
     Hooker.inject_script(jsfile)
     logl("js injected.");
+    #time.sleep(1)
     Hooker.go()
     logl("go!");
 
