@@ -3,8 +3,6 @@ import sys
 import time
 from utils.utils import *
 
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 class ProcessHooker:
     def __init__(self,cmd):
@@ -52,9 +50,17 @@ class ProcessHooker:
         logl("resume pid:"+str(self.pid))
         frida.resume(self.pid)
 
+    def waitToDie(self):
+        sys.stdin.read()
+        self.session.detach()
+
+
+
+
 
 def main():
-    cmd=[r"F:\projects\C++\win32\Release\win32.exe"]
+    #cmd=[r"F:\projects\C++\win32\Release\win32.exe"]
+    cmd=[r"C:\Program Files (x86)\Tencent\WeChat\WeChat.exe"]
     jsfile="mw.js"
     Hooker=ProcessHooker(cmd)
     logl("process spwnded.");
@@ -63,6 +69,11 @@ def main():
     #time.sleep(1)
     Hooker.go()
     logl("go!");
+    Hooker.waitToDie()
+    logl("end")
+
+
+
 
 if __name__ == '__main__':
     main()

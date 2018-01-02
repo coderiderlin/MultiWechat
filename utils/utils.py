@@ -4,12 +4,9 @@ import subprocess
 import threading
 import time
 import urllib
-import urllib2
 
 import chardet
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 import requests
 from requests import ConnectionError
@@ -55,8 +52,8 @@ USER_AGENTS = [
 def appendStrToFile(sstr, filepath):
     f = open(filepath, "a+")
     try:
-        sstr = sstr.encode('utf-8')
-    except Exception, e:
+        sstr = sstr.encode('utf-8').decode()
+    except Exception as e:
         pass
     f.write(sstr)
     f.close()
